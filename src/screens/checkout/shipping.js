@@ -19,7 +19,7 @@ import Address from "./address";
 import CheckoutHeader from "./header";
 import styles from "./../styles";
 import Thumbnail from "../../theme/components/Thumbnail";
-import RainhutTacoConfig from './../../RainhutTacoConfig'
+import RainhutTacoConfig from "./../../RainhutTacoConfig";
 
 export default class CheckoutShipping extends Component {
   state = {
@@ -27,43 +27,39 @@ export default class CheckoutShipping extends Component {
   };
 
   componentDidMount() {
-
-    if(global.checkout.shipping != undefined) {
-      this.setState(global.checkout.shipping)
+    if (global.checkout.shipping != undefined) {
+      this.setState(global.checkout.shipping);
     }
-    
-
   }
 
   doNonce = nonce => {
-    console.log(nonce); 
+    console.log(nonce);
     //send nonce to own api here!!!
-    
+
     //redirect to success payment.
     this.props.navigation.navigate("CheckoutSuccess");
   };
 
-  validateShipping = (isBilling) => {
-    var types1 = ["street", "city", "state", "zip", "firstName", "lastName"]
-    var shipType = "Shipping"
-    if(isBilling) {
-        shipType = "Billing"
+  validateShipping = isBilling => {
+    var types1 = ["street", "city", "state", "zip", "firstName", "lastName"];
+    var shipType = "Shipping";
+    if (isBilling) {
+      shipType = "Billing";
     }
 
-    var min = 2
-    if(types1 == "zip") {
-        min = 5
+    var min = 2;
+    if (types1 == "zip") {
+      min = 5;
     }
 
-    for(var i=0; i<types1.length; i++) {
-      var type = types1[i] + shipType
-      var strVal = this.state[type]
-      if(strVal == undefined || strVal.length < min) {
+    for (var i = 0; i < types1.length; i++) {
+      var type = types1[i] + shipType;
+      var strVal = this.state[type];
+      if (strVal == undefined || strVal.length < min) {
         this.setState({
           [type + "Error"]: true
         });
-      }
-      else {
+      } else {
         this.setState({
           [type + "Error"]: false
         });
@@ -71,52 +67,47 @@ export default class CheckoutShipping extends Component {
           [type + "Success"]: true
         });
       }
-  }
-
-    for(var i=0; i<types1.length; i++) {
-        var type = types1[i] + shipType
-        var value = this.state[type + "Error"]
-        if(value == undefined || value == true) {
-            return false
-        }
     }
-    return true
-  }
+
+    for (var i = 0; i < types1.length; i++) {
+      var type = types1[i] + shipType;
+      var value = this.state[type + "Error"];
+      if (value == undefined || value == true) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   goBack = () => {
-    this.saveInfo()
-    this.props.navigation.navigate('CheckoutSummary')
-  }
+    this.saveInfo();
+    this.props.navigation.navigate("CheckoutSummary");
+  };
 
   saveInfo = () => {
-    global.checkout.shipping = Object.assign({}, this.state)
-  }
+    global.checkout.shipping = Object.assign({}, this.state);
+  };
 
-  doPayment = () => { 
+  doPayment = () => {
+    var validShipping = this.validateShipping(false);
+    var validBilling = this.validateShipping(true);
+    this.forceUpdate();
 
-
-    var validShipping = this.validateShipping(false)
-    var validBilling = this.validateShipping(true)
-    this.forceUpdate()
-
-    var validBilling2 = validBilling
-    if(this.state.billingSame) {
+    var validBilling2 = validBilling;
+    if (this.state.billingSame) {
       validBilling2 = true;
     }
 
-
-
-    if(validShipping && validBilling2) {
-
+    if (validShipping && validBilling2) {
       this.saveInfo();
-    var BTClient = require("react-native-braintree-xplat");
-    let braintreeToken = RainhutTacoConfig.braintreeToken
-    BTClient.setup(braintreeToken);
-    BTClient.showPaymentViewController({})
-      .then(this.doNonce)
-      .catch(function(err) {
-        alert(err);
-      });
+      var BTClient = require("react-native-braintree-xplat");
+      let braintreeToken = RainhutTacoConfig.braintreeToken;
+      BTClient.setup(braintreeToken);
+      BTClient.showPaymentViewController({})
+        .then(this.doNonce)
+        .catch(function(err) {
+          alert(err);
+        });
     }
   };
 
@@ -139,7 +130,7 @@ export default class CheckoutShipping extends Component {
       this.setState({
         ["lastName" + type]: p1.familyName
       });
-      
+
       if (address1 != null) {
         this.setState({
           ["street" + type]: address1.street,
@@ -148,10 +139,10 @@ export default class CheckoutShipping extends Component {
           ["zip" + type]: address1.postCode
         });
       }
-      
-      this.forceUpdate(()=> {
-        this.validateShipping(isBilling)
-      })
+
+      this.forceUpdate(() => {
+        this.validateShipping(isBilling);
+      });
     }
   };
 
@@ -174,7 +165,8 @@ export default class CheckoutShipping extends Component {
         />
         <Content padder>
           <H2 style={styles.mb20}>Shipping Address</H2>
-          <Button style={styles.mb20}
+          <Button
+            style={styles.mb20}
             block
             light
             onPress={() => {
@@ -201,7 +193,8 @@ export default class CheckoutShipping extends Component {
           ) : (
             <Content style={{ marginTop: 40 }}>
               <H2 style={styles.mb20}>Billing Address</H2>
-              <Button style={styles.mb20}
+              <Button
+                style={styles.mb20}
                 block
                 light
                 onPress={() => {
@@ -211,7 +204,7 @@ export default class CheckoutShipping extends Component {
                 <Icon name="person" />
                 <Text>Select From Contacts</Text>
               </Button>
-              <Address parent={this}  state={this.state} isShipping={false} />
+              <Address parent={this} state={this.state} isShipping={false} />
             </Content>
           )}
           <Button onPress={() => this.doPayment()} block>

@@ -20,56 +20,58 @@ export class EditPage extends Component {
   constructor(props) {
     super(props);
 
+    
   }
 
- 
+  
 
   saveButtonPressed = () => {
-    var oldCount = global.book.pages[global.currentBookIdx].entries.length
-    global.book.pages[global.currentBookIdx].entries = this.state.entries
-    var didDelete = false
-    var needsLayout = false
-    if(this.state.entries.length == 0) {
-      didDelete = true
+    var oldCount = global.book.pages[global.currentBookIdx].entries.length;
+    global.book.pages[global.currentBookIdx].entries = this.state.entries;
+    var didDelete = false;
+    var needsLayout = false;
+    if (this.state.entries.length == 0) {
+      didDelete = true;
     }
-    if(oldCount != this.state.entries) {
-      needsLayout = true
+    if (oldCount != this.state.entries) {
+      needsLayout = true;
     }
-    this.setCallback(needsLayout, didDelete)
-    this.backButtonPressed()
-  }
+    this.setCallback(needsLayout, didDelete);
+    this.backButtonPressed();
+  };
 
   setCallback = (needsLayout, didDeletePage) => {
     const { navigation } = this.props;
     navigation.state.params.callback(needsLayout, didDeletePage);
-  }
+  };
 
   backButtonPressed = () => {
     this.props.navigation.goBack();
   };
 
-
   state = {
     entries: global.book.pages[global.currentBookIdx].entries,
     doUpdate: false
-  }
-  
-  
+  };
+
   setEntriesState = () => {
-    this.setState({ entries: global.book.pages[global.currentBookIdx].entries });
+    this.setState({
+      entries: global.book.pages[global.currentBookIdx].entries
+    });
     this.forceUpdate();
-  }
+  };
+
+
 
   doUpdate = () => {
-    this.setState({doUpdate: false})
+    this.setState({ doUpdate: false });
     this.forceUpdate();
-  }
+  };
   didEditEntryCallback = () => {
-    this.setEntriesState()
-    this.setState({doUpdate: true})
+    this.setEntriesState();
+    this.setState({ doUpdate: true });
 
-    window.setTimeout(this.doUpdate.bind(this), 10)
-
+    window.setTimeout(this.doUpdate.bind(this), 10);
   };
 
   editPressed = index => {
@@ -79,21 +81,25 @@ export class EditPage extends Component {
     });
   };
 
-  getImageLeft = (image) => {
-    if(image == '') {
-      return (null)
+  getImageLeft = image => {
+    if (image == "") {
+      return null;
+    } else {
+      return (
+        <Left>
+          {image == "" ? (
+            <Thumbnail />
+          ) : (
+            <Thumbnail square source={{ uri: image }} />
+          )}
+        </Left>
+      );
     }
-    else {
-      return (<Left>
-        {(image == '')?(<Thumbnail />):
-        (<Thumbnail square source={{uri: image }} />)}
-            </Left>)
-    }
-  }
+  };
 
   render() {
-    if(this.state.doUpdate) {
-      return <Container></Container>
+    if (this.state.doUpdate) {
+      return <Container />;
     }
     return (
       <Container style={styles.container}>
@@ -112,9 +118,12 @@ export class EditPage extends Component {
             <Title>Edit Entries</Title>
           </Body>
           <Right>
-            <Button transparent  onPress={() => {
+            <Button
+              transparent
+              onPress={() => {
                 this.saveButtonPressed();
-              }}>
+              }}
+            >
               <Icon name="checkmark-circle" />
             </Button>
           </Right>

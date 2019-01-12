@@ -1,0 +1,40 @@
+<b>Setup</b>
+
+Create a a file RainhutTacoConfig.js and add to source
+
+```
+class RainhutTacoConfig {
+    constructor() {
+        
+    }
+   static apiPublicKey = "APIKEYHERE"
+    static apiSecretKey = "SECRETKEYHERE"
+    static layoutFolder = "LAYOUTFOLDERHERE"
+    static braintreeToken = "BRAINTREE_TOKEN_HERE"
+}
+module.exports = RainhutTacoConfig
+```
+
+
+ADD to setup config when calling the api
+```
+ setup.fixForReturn = true
+ ```
+
+ Modify src/rainhutapi.js to point to staging or production depending on your needs
+
+
+ When Using to Preview. Best Practices.
+
+Call create using low res images for the preview. This will speed up the process.
+Pass original image width and image height into the entries list.
+When calling upload then pass original high res images.
+
+
+*Edit src/home/pickthemes.js to match any theme changes you might have to setup to make a different look/feel book
+*Edit src/home/picklayouts.js to match your layout jpeg images
+
+Check up is setup as a bare bones project, you will need to decide when you want to start the book upload create process and how to deal with payment/sending to printer
+
+Saving is setup as barebones as well. You can change how/when you would like to save books and keep track of orders locally. 
+

@@ -21,7 +21,8 @@ import {
   Button,
   Label,
   Left,
-  Right
+  Right,
+  CheckBox
 } from "native-base";
 import FastImage from "react-native-fast-image";
 import { createImageProgress } from "react-native-image-progress";
@@ -30,7 +31,6 @@ import * as Progress from "react-native-progress";
 
 const INDICATORS = [null, Progress.Bar, Progress.Circle, Progress.Pie];
 import styles from "./../styles";
-
 
 export class EditEntry extends React.Component {
   constructor(props) {
@@ -63,8 +63,6 @@ export class EditEntry extends React.Component {
     };
   }
 
-  
-
   updateSize = height => {
     this.setState({
       height
@@ -78,42 +76,44 @@ export class EditEntry extends React.Component {
   };
 
   backButtonPressed = () => {
-    this.goBackToPage()
+    this.goBackToPage();
   };
 
   goBackToPage = () => {
-    this.props.navigation.goBack()//.navigate("EditPage");
-  }
+    this.props.navigation.goBack(); //.navigate("EditPage");
+  };
 
   removeImagePressed = () => {
-    this.setState({img: "", removeImage: true})
-  }
+    this.setState({ removeImage: !this.state.removeImage });
+  };
 
   saveButtonPressed = () => {
     var newEntry = {};
-    Object.assign(newEntry, global.book.pages[global.currentBookIdx].entries[global.currentEntryIndex])
-    newEntry.title = this.state.title
-    newEntry.content = this.state.content
-    newEntry.header = this.state.header
-    newEntry.isHeader = this.state.isHeader
-    if(this.state.removeImage) {
-        newEntry.image = ""
+    Object.assign(
+      newEntry,
+      global.book.pages[global.currentBookIdx].entries[global.currentEntryIndex]
+    );
+    newEntry.title = this.state.title;
+    newEntry.content = this.state.content;
+    newEntry.header = this.state.header;
+    newEntry.isHeader = this.state.isHeader;
+    if (this.state.removeImage) {
+      newEntry.image = "";
     }
-    global.book.pages[global.currentBookIdx].entries[global.currentEntryIndex] = newEntry
+    global.book.pages[global.currentBookIdx].entries[
+      global.currentEntryIndex
+    ] = newEntry;
     this.props.navigation.state.params.callback();
     this.goBackToPage();
-    
-   
   };
 
+  saveTitle = title => {
+    this.setState({ title: title });
+  };
 
-  saveTitle = (title) => {
-    this.setState({title: title})
-  }
-
-  saveContent = (content) => {
-    this.setState({content: content})
-  }
+  saveContent = content => {
+    this.setState({ content: content });
+  };
 
   render() {
     const { title, height, heightTitle } = this.state;
@@ -143,9 +143,12 @@ export class EditEntry extends React.Component {
             <Title>Edit Entry</Title>
           </Body>
           <Right>
-            <Button transparent onPress={() => {
+            <Button
+              transparent
+              onPress={() => {
                 this.saveButtonPressed();
-              }}>
+              }}
+            >
               <Icon name="checkmark-circle" />
             </Button>
           </Right>
@@ -154,39 +157,30 @@ export class EditEntry extends React.Component {
           <Form>
             <Item stackedLabel>
               <Label>Title</Label>
-              <Input
-                value={this.state.title}
-                onChangeText={this.saveTitle}
-              />
+              <Input value={this.state.title} onChangeText={this.saveTitle} />
             </Item>
             <Item stackedLabel last>
               <Label>Content</Label>
               <Textarea
                 value={this.state.content}
-                style={{textAlign: 'left', alignSelf: 'flex-start', height: 100, paddingLeft: 0}}
+                style={{
+                  textAlign: "left",
+                  alignSelf: "flex-start",
+                  height: 100,
+                  paddingLeft: 0
+                }}
                 onChangeText={this.saveContent}
               />
             </Item>
 
             {this.state.img != "" && (
               <Item>
-              <Image
-                source={{ uri: this.state.img }}
-                style={[styles1.image, {paddingLeft: 10, paddingRight: 10, paddingTop: 10, paddingBottom: 10}]}
-                indicator={Progress.Pie}
-                resizeMode="cover"
-                indicatorProps={{
-                  size: 80,
-                  borderWidth: 0,
-                  color: "rgba(150, 150, 150, 1)",
-                  unfilledColor: "rgba(200, 200, 200, 0.2)"
-                }}
-              />
-
-              <Button  onPress={() => {
-                this.removeImagePressed();
-              }}><Text>Remove Image</Text></Button>
-             </Item>
+                <Text>Show Image</Text>
+                <CheckBox
+                  checked={!this.state.removeImage}
+                  onPress={this.removeImagePressed}
+                />
+              </Item>
             )}
           </Form>
         </Content>
@@ -194,15 +188,4 @@ export class EditEntry extends React.Component {
     );
   }
 }
-
-const styles1 = StyleSheet.create({
-
-  image: {
-    width: 100,
-    height: 100,
-
-    marginRight: 20
-  }
-});
-
 export default EditEntry;

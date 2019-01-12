@@ -1,6 +1,6 @@
 import rainhutapi from "./rainhutapi";
-import RainhutTacoConfig from './../RainhutTacoConfig'
-import SampleData from './sampleData'
+import RainhutTacoConfig from "./../RainhutTacoConfig";
+import SampleData from "./sampleData";
 const sampleBookEntries = {
   setup: {
     paddingLeft: 50,
@@ -17,7 +17,7 @@ const sampleBookEntries = {
     cropMarginTop: 0,
     width: 1000,
     height: 800,
-    birthday:"2017-08-11",
+    birthday: "2017-08-11",
     titleStyle: {
       textColor: "#333333",
       fontFamily: "Roboto",
@@ -58,7 +58,7 @@ const sampleBookEntries = {
     borderWidth: 4,
     minimumDpi: 90,
     highResDpi: 150,
-    
+
     minTextFullPage: 660,
     alignItems: "flex-start",
     justifyItems: "center",
@@ -83,38 +83,34 @@ generateSampleEntries = () => {
   //lorem = lorem.substr(0, 55)
 
   for (var i = 0; i < 1; i++) {
-   //   images.push("");
+    //   images.push("");
   }
   for (var i = 0; i < 10; i++) {
     var highRes = Math.floor(Math.random() * 4);
     var min = 550;
     var max = 900;
 
- 
-    
-
     var width = Math.floor(Math.random() * max) + min;
     var height = Math.floor(Math.random() * max) + min;
 
-    var widthActual = width
-    var heightActual = height
+    var widthActual = width;
+    var heightActual = height;
     if (highRes == 1) {
-     // widthActual = width*4;
-     // heightActual = height*4;
+      // widthActual = width*4;
+      // heightActual = height*4;
     }
 
-    if(width % 2 != 0) {
-      
-      width -= 1
+    if (width % 2 != 0) {
+      width -= 1;
     }
-    if(height % 2 != 0) {
-      height -= 1
+    if (height % 2 != 0) {
+      height -= 1;
     }
     var square = Math.floor(Math.random() * 2) + 1;
     if (square == 1) {
-      var tmp = height
+      var tmp = height;
       height = width;
-      width = tmp
+      width = tmp;
     }
     images.push(
       "https://source.unsplash.com/random/" + width + "x" + height + "?sig=" + i
@@ -134,7 +130,7 @@ generateSampleEntries = () => {
 
     var item = {};
 
-   /* if(image == "") {
+    /* if(image == "") {
       item.title = title;
       item.content = content;
     }
@@ -143,17 +139,16 @@ generateSampleEntries = () => {
       item.content = ""//content;
     }
     */
-   item.title = title
+    item.title = title;
     item.content = content;
-   var noText = Math.floor(Math.random() * 4) + 1;
-   if(noText == 1) {
-    item.title = ""
-    item.content = "";
-   }
-   else if(noText == 2) {
-    item.image = ""
-   }
-   
+    var noText = Math.floor(Math.random() * 4) + 1;
+    if (noText == 1) {
+      item.title = "";
+      item.content = "";
+    } else if (noText == 2) {
+      item.image = "";
+    }
+
     item.image = image;
     item.imageWidth = widthActual;
     item.imageHeight = heightActual;
@@ -165,22 +160,19 @@ generateSampleEntries = () => {
   return entries;
 };
 
-
-
-
-
-
-
 export const RainhutCreateBook = (entries, successBlock, errorBlock) => {
   if (entries == null) {
     entries = generateSampleEntries();
   }
-  var api = new rainhutapi(RainhutTacoConfig.apiSecretKey, RainhutTacoConfig.apiPublicKey);
+  var api = new rainhutapi(
+    RainhutTacoConfig.apiSecretKey,
+    RainhutTacoConfig.apiPublicKey
+  );
   //sample entries... sample setup
   //api.createBook(entries, sampleBookEntries.setup, successBlock);
-  var sample = SampleData.sample1
-  sample.setup.fixForReturn = true
-  api.createBook(getsampleEntries2(), sample.setup, successBlock)
+  var sample = SampleData.sample1;
+  sample.setup.fixForReturn = true;
+  api.createBook(getsampleEntries2(), sample.setup, successBlock);
   //api.createBook(null, null, successBlock);
 };
 
@@ -200,69 +192,64 @@ export const RainhutUpdateBook = (
     book2.layoutToBestFit = layoutToBestFit;
   }
 
-  var api = new rainhutapi(RainhutTacoConfig.apiSecretKey, RainhutTacoConfig.apiPublicKey);
+  var api = new rainhutapi(
+    RainhutTacoConfig.apiSecretKey,
+    RainhutTacoConfig.apiPublicKey
+  );
   api.updateBook(book2, successCallback);
 };
 
-export const RainhutUploadBook = (
-  book,
-  successCallback
-) => {
+export const RainhutUploadBook = (book, successCallback) => {
   var book2 = JSON.parse(JSON.stringify(book));
-  var api = new rainhutapi(RainhutTacoConfig.apiSecretKey, RainhutTacoConfig.apiPublicKey);
+  var api = new rainhutapi(
+    RainhutTacoConfig.apiSecretKey,
+    RainhutTacoConfig.apiPublicKey
+  );
   api.uploadBook(book2, successCallback);
 };
-
-
-
-
 
 function getEntriesFromPages(pages) {
   var entries = [];
   for (var i = 0; i < pages.length; i++) {
     var pageEntries = pages[i].entries;
     for (var j = 0; j < pageEntries.length; j++) {
-      var pageEntry = pageEntries[j]
-      console.log(pageEntry)
-      pageEntry.author = "joe"
-     // if(pageEntry.answer.includes("Today")) {
-       entries.push(pageEntry);
-     // }
+      var pageEntry = pageEntries[j];
+      console.log(pageEntry);
+      pageEntry.author = "joe";
+      // if(pageEntry.answer.includes("Today")) {
+      entries.push(pageEntry);
+      // }
     }
   }
-  for(var i=0; i<entries.length; i++) {
+  for (var i = 0; i < entries.length; i++) {
     var highRes = Math.floor(Math.random() * 4);
     var min = 550;
     var max = 900;
 
- 
-    
-
     var width = Math.floor(Math.random() * max) + min;
     var height = Math.floor(Math.random() * max) + min;
     if (highRes == 1) {
-      width = width*4;
-      height = height*4;
+      width = width * 4;
+      height = height * 4;
     }
     var square = Math.floor(Math.random() * 2) + 1;
     if (square == 1) {
-      var tmp = height
+      var tmp = height;
       height = width;
-      width = tmp
+      width = tmp;
     }
-    var entry = entries[i] 
-    if(entry.image != undefined && entry.image != "") {
-    entry.image = "https://source.unsplash.com/random/" + width + "x" + height
-    entry.imageWidth = width
-    entry.imageHeight = height;
+    var entry = entries[i];
+    if (entry.image != undefined && entry.image != "") {
+      entry.image =
+        "https://source.unsplash.com/random/" + width + "x" + height;
+      entry.imageWidth = width;
+      entry.imageHeight = height;
     }
   }
   return entries;
 }
 
 function getsampleEntries2() {
-  
-   var entries = getEntriesFromPages(SampleData.sample1.pages)
-  return entries
+  var entries = getEntriesFromPages(SampleData.sample1.pages);
+  return entries;
 }
-

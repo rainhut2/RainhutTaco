@@ -3,30 +3,25 @@ import { Header, Left, Right, Button, Icon, Body, Title } from "native-base";
 
 export default class CheckoutHeader extends Component {
   backButtonPressed = () => {
-    if(this.props.backCallback != undefined) {
+    if (this.props.backCallback != undefined) {
       this.props.backCallback();
-    }
-    else if (this.props.backRoute == "goBack") {
+    } else if (this.props.backRoute == "goBack") {
       this.props.navigation.goBack();
-    } 
-    else if(this.props.backRoute == "goBackHome") {
-      this.props.navigation.popToTop()
-    }
-    else {
+    } else if (this.props.backRoute == "goBackHome") {
+      this.props.navigation.popToTop();
+    } else {
       this.props.navigation.navigate(this.props.backRoute);
     }
   };
 
   nextButtonPressed = () => {
-      if(this.props.nextCallback == undefined) {
-        this.props.navigation.navigate(this.props.nextRoute);
-      }
-      else if(this.props.nextCallback == "goBackHome") {
-        this.props.navigation.popToTop()
-      }
-      else {
-          this.props.nextCallback();
-      }
+    if (this.props.nextCallback == undefined) {
+      this.props.navigation.navigate(this.props.nextRoute);
+    } else if (this.props.nextCallback == "goBackHome") {
+      this.props.navigation.popToTop();
+    } else {
+      this.props.nextCallback();
+    }
   };
   render() {
     const { items } = this.props;

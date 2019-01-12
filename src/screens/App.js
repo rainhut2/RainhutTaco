@@ -15,13 +15,15 @@ import CheckoutSuccess from "./checkout/success";
 import CheckoutShipping from "./checkout/shipping";
 import ContactsPicker from "./checkout/contactsPicker";
 
+import {SafeAreaView} from 'react-native';
+import styles from "./styles";
+
 const Drawer = createDrawerNavigator(
   {
     Home: { screen: Home },
     Orders: { screen: Orders },
     Settings: { screen: Settings },
-   Saved: {screen: Saved}
-    
+    Saved: { screen: Saved }
   },
   {
     initialRouteName: "Home",
@@ -33,7 +35,7 @@ const Drawer = createDrawerNavigator(
 );
 
 const AppNavigator = StackNavigator(
-  {   
+  {
     Drawer: { screen: Drawer },
     EditPage: { screen: EditPage },
     EditEntry: { screen: EditEntry },
@@ -49,14 +51,11 @@ const AppNavigator = StackNavigator(
   }
 );
 
-
-
 export default () => (
   <Root>
-     <AppNavigator />
+    <AppNavigator></AppNavigator>
   </Root>
 );
-
 
 /* + (BOOL)requiresMainQueueSetup {
   return YES; braintree.m ios file

@@ -1,12 +1,11 @@
 import Contacts from "react-native-contacts";
-import Geocoder from 'react-native-geocoder';
+import Geocoder from "react-native-geocoder";
 import React, { Component } from "react";
 import {
   Container,
   Header,
   Content,
   List,
-  Title,
   Item,
   ListItem,
   Thumbnail,
@@ -21,9 +20,7 @@ import {
 import styles from "./../styles";
 //import Geocoder from 'react-native-geocoder';
 
-import { PermissionsAndroid, Platform } from 'react-native';
-
-
+import { PermissionsAndroid, Platform } from "react-native";
 
 export default class ContactsPicker extends Component {
   constructor(props) {
@@ -38,116 +35,108 @@ export default class ContactsPicker extends Component {
   checkContactsIOS = () => {
     Contacts.checkPermission((err, permission) => {
       if (err) throw err;
-    
-     
-      if (permission === 'undefined') {
-        Contacts.requestPermission((err, permission) => {
-          
-        })
+
+      if (permission === "undefined") {
+        Contacts.requestPermission((err, permission) => {});
       }
-      if (permission === 'authorized') {
+      if (permission === "authorized") {
         // yay!
       }
-      if (permission === 'denied') {
+      if (permission === "denied") {
         // x.x
       }
-    })
-  }
+    });
+  };
 
-  getGeoCodeAddress = async(addressString) => {
+  getGeoCodeAddress = async addressString => {
     try {
       let res = await Geocoder.geocodeAddress(addressString);
-      return res
-  }
-  catch(err) {
+      return res;
+    } catch (err) {
       console.log(err);
-      return null
-  }
-  }
-  
-  checkContactsAndroid = async() => {
-
-    const check = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS)
-    if(check === PermissionsAndroid.RESULTS.GRANTED) {
+      return null;
     }
-    else {
+  };
+
+  checkContactsAndroid = async () => {
+    const check = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.READ_CONTACTS
+    );
+    if (check === PermissionsAndroid.RESULTS.GRANTED) {
+    } else {
       try {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
           {
-            'title': 'Can you grant access to contacts',
-            'message': 'Contacts are used to help fill out your checkout quickly.'
+            title: "Can you grant access to contacts",
+            message: "Contacts are used to help fill out your checkout quickly."
           }
-        )
+        );
 
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("yah contacts")
+          console.log("yah contacts");
         } else {
-          console.log("boo")
+          console.log("boo");
         }
       } catch (err) {
-        console.warn(err)
+        console.warn(err);
       }
     }
-    
-  }
+  };
 
-  checkContacts = () =>  {
-    if(Platform.OS === 'ios') {
-     // this.checkContactsIOS()
+  checkContacts = () => {
+    if (Platform.OS === "ios") {
+      // this.checkContactsIOS()
+    } else {
+      this.checkContactsAndroid();
     }
-    else {
-      this.checkContactsAndroid()
-    }
-  }
+  };
 
-  fixupContacts = async(contacts) => {
+  fixupContacts = async contacts => {
     //Geocoder.fallbackToGoogle(MY_KEY);
 
-    if(Platform.OS != 'ios') {
-      for(var i=0; i<contacts.length; i++) {
+    if (Platform.OS != "ios") {
+      for (var i = 0; i < contacts.length; i++) {
         var contact = contacts[i];
-        let addressobj = await this.getGeoCodeAddress(contact.postalAddresses[0].street)
-        if(addressobj != null ) {
-          if(addressobj.number != null && addressobj.streetname != null) {
-            contact.street = addressobj.number + " " + addressobj.streetname
+        let addressobj = await this.getGeoCodeAddress(
+          contact.postalAddresses[0].street
+        );
+        if (addressobj != null) {
+          if (addressobj.number != null && addressobj.streetname != null) {
+            contact.street = addressobj.number + " " + addressobj.streetname;
           }
-          contact.country = addressobj.countryCode
-          contact.postalCode = addressobj.postalCode
-          contact.state = addressobj.adminArea
-          contact.city = addressobj.locality
+          contact.country = addressobj.countryCode;
+          contact.postalCode = addressobj.postalCode;
+          contact.state = addressobj.adminArea;
+          contact.city = addressobj.locality;
+        } else {
         }
-        else {
-
-        }
-        
       }
     }
-  }
+  };
 
   loadContacts = () => {
-this.checkContacts()
-  
+    this.checkContacts();
 
     if (this.state.searchText == "") {
       Contacts.getAll((err, contacts) => {
         if (err) throw err;
-        this.fixupContacts(contacts)
+        this.fixupContacts(contacts);
         this.setState({
           contacts: contacts
         });
-        this.forceUpdate()
+        this.forceUpdate();
       });
     } else {
       Contacts.getContactsMatchingString(
         this.state.searchText,
         (err, contacts) => {
           if (err) throw err;
-          this.fixupContacts(contacts)
+          this.fixupContacts(contacts);
           this.setState({
             contacts: contacts
           });
-          this.forceUpdate()
+          this.forceUpdate();
         }
       );
     }
@@ -158,14 +147,16 @@ this.checkContacts()
   }
 
   selectPressed = index => {
-    this.props.navigation.state.params.callback(this.state.contacts[index], this.props.navigation.state.params.isBilling);
-    this.props.navigation.navigate('CheckoutShipping')
+    this.props.navigation.state.params.callback(
+      this.state.contacts[index],
+      this.props.navigation.state.params.isBilling
+    );
+    this.props.navigation.navigate("CheckoutShipping");
   };
-  
+
   backButtonPressed = () => {
     this.props.navigation.goBack();
   };
-  
 
   render() {
     if (this.state == null) {
@@ -174,7 +165,7 @@ this.checkContacts()
     return (
       <Container style={styles.container}>
         <Header searchBar rounded>
-        <Button
+          <Button
             transparent
             onPress={() => {
               this.backButtonPressed();
@@ -189,30 +180,37 @@ this.checkContacts()
               placeholder="Search"
             />
             <Icon name="ios-people" />
-            <Button transparent onPress={()=>this.loadContacts()}>
-            <Text>Search</Text>
-          </Button>
+            <Button transparent onPress={() => this.loadContacts()}>
+              <Text>Search</Text>
+            </Button>
           </Item>
-        
         </Header>
 
         <Content>
-          <List 
+          <List
             dataArray={this.state.contacts}
             renderRow={(item, i1, index2) => (
               <ListItem thumbnail>
                 <Left>
-               {item.hasThumbnail ? (
+                  {item.hasThumbnail ? (
                     <Thumbnail square source={{ uri: item.thumbnailPath }} />
-                  ) : (<Icon name='person'/>)}
-                  </Left>
+                  ) : (
+                    <Icon name="person" />
+                  )}
+                </Left>
                 <Body>
                   <Text>
                     {item.familyName}, {item.givenName}
                   </Text>
-                {(item.postalAddresses.length > 0)?(<Text>
-                    {item.postalAddresses[0].street}, {item.postalAddresses[0].city}, {item.postalAddresses[0].state}
-                </Text>):(<Text/>)}
+                  {item.postalAddresses.length > 0 ? (
+                    <Text>
+                      {item.postalAddresses[0].street},{" "}
+                      {item.postalAddresses[0].city},{" "}
+                      {item.postalAddresses[0].state}
+                    </Text>
+                  ) : (
+                    <Text />
+                  )}
                 </Body>
                 <Right>
                   <Button

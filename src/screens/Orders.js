@@ -13,7 +13,6 @@ import {
   List,
   ListItem,
   ActionSheet
-
 } from "native-base";
 import styles from "./styles";
 
@@ -27,64 +26,61 @@ var BUTTONSCANCANCEL = [
   BUTTONS[1]
 ];
 
-
 var sampleItems = [
-    {
-        orderId: 1,
-        title: "Book",
-        description: "",
-        date: "1/11/2018",
-        orderStatus: "shipped"
-    },
-    {
-        orderId: 2,
-        title: "Book",
-        description: "",
-        date: "5/19/2018",
-        orderStatus: "processing"
-    },
-    {
-        orderId: 3,
-        title: "Book",
-        description: "",
-        date: "1/1/2018",
-        orderStatus: "shipped"
-    }
-]
-    
+  {
+    orderId: 1,
+    title: "Book",
+    description: "",
+    date: "1/11/2018",
+    orderStatus: "shipped"
+  },
+  {
+    orderId: 2,
+    title: "Book",
+    description: "",
+    date: "5/19/2018",
+    orderStatus: "processing"
+  },
+  {
+    orderId: 3,
+    title: "Book",
+    description: "",
+    date: "1/1/2018",
+    orderStatus: "shipped"
+  }
+];
 
 class Orders extends Component {
-    state = {
-        items: sampleItems
+  state = {
+    items: sampleItems
+  };
+
+  selectOrder = index => {
+    //do cancel order here...
+    var order = this.state.items[index];
+    var cancelIndex = 1;
+    var buttons = BUTTONS;
+
+    if (order.orderStatus == "processing") {
+      cancelIndex = 2;
+      buttons = BUTTONSCANCANCEL;
     }
 
-    selectOrder = (index) => {
-        //do cancel order here...
-      var order = this.state.items[index]
-      var cancelIndex = 1
-      var buttons = BUTTONS
-
-      if(order.orderStatus == "processing") {
-        cancelIndex = 2
-        buttons = BUTTONSCANCANCEL
+    ActionSheet.show(
+      {
+        options: buttons,
+        cancelButtonIndex: cancelIndex,
+        title: "Order Options"
+      },
+      buttonIndex => {
+        if (buttonIndex == 0) {
+          alert("order again");
+        } else if (cancelIndex != buttonIndex) {
+          alert("cancel order");
+        }
       }
-
-        ActionSheet.show(
-          {
-            options: buttons,
-            cancelButtonIndex: cancelIndex,
-            title: "Order Options"
-          },
-          buttonIndex => {
-            if(buttonIndex == 0) {
-              alert("order again")
-            }
-            else if(cancelIndex != buttonIndex) {
-              alert("cancel order")
-            }
-          }
-        )
-    }
+    );
+  };
 
   render() {
     return (
@@ -98,33 +94,25 @@ class Orders extends Component {
           <Body>
             <Title>Orders</Title>
           </Body>
-          <Right>
-            
-          </Right>
+          <Right />
         </Header>
         <Content padder>
-          <List 
+          <List
             dataArray={this.state.items}
             renderRow={(item, i1, index2) => (
-              <ListItem >
+              <ListItem>
                 <Body>
                   <Text>
-                    {item.title} 
+                    {item.title}
                     {item.description}
                   </Text>
-                  <Text>
-                  {item.date}
-                  </Text>
+                  <Text>{item.date}</Text>
                 </Body>
-                   <Right>
-                        <Button
-                    transparent
-                    onPress={() => this.selectOrder(index2)}
-                  >
-                    <Icon name='checkmark-circle' />
+                <Right>
+                  <Button transparent onPress={() => this.selectOrder(index2)}>
+                    <Icon name="checkmark-circle" />
                   </Button>
-                  </Right>
-                 
+                </Right>
               </ListItem>
             )}
           />

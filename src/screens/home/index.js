@@ -3,7 +3,6 @@ import {
   Container,
   Header,
   Title,
-  Content,
   Button,
   Icon,
   Left,
@@ -19,21 +18,19 @@ import FastImage from "react-native-fast-image";
 import { createImageProgress } from "react-native-image-progress";
 const Image = createImageProgress(FastImage);
 import * as Progress from "react-native-progress";
-const INDICATORS = [null, Progress.Bar, Progress.Circle, Progress.Pie];
-import { RainhutCreateBook, RainhutUpdateBook, RainhutUploadBook } from "./../../api/index";
-import tacoDbHelperClass from "./../../db/tacoDbHelper"
-const tacoDbHelper = new tacoDbHelperClass()
-import { ActivityIndicator, Dimensions, TouchableOpacity } from "react-native";
-
 import {
-  State,
-  LongPressGestureHandler,
-  TapGestureHandler
-} from "react-native-gesture-handler";
+  RainhutCreateBook,
+  RainhutUpdateBook,
+  RainhutUploadBook
+} from "./../../api/index";
+import tacoDbHelperClass from "./../../db/tacoDbHelper";
+const tacoDbHelper = new tacoDbHelperClass();
+import { ActivityIndicator, Dimensions, TouchableOpacity } from "react-native";
 import PickLayouts from "./PickLayouts";
 import PickThemes from "./PickThemes";
-import {checkoutObjectInit} from './../checkout/checkoutObject'
-var sliderWidth, itemWidth = 0;
+import { checkoutObjectInit } from "./../checkout/checkoutObject";
+var sliderWidth,
+  itemWidth = 0;
 
 class Home extends Component {
   state = {
@@ -44,16 +41,14 @@ class Home extends Component {
   };
 
   createBookSuccess = json => {
-    if(json.message != undefined) {
-
-      alert(json.message)
-    }
-    else {
-    global.book = json;
-    console.log(json.pages[15])
-    this.setGroupPages(json.pages);
-    this.setCurrentBookIndex(true);
-    this.forceUpdate();
+    if (json.message != undefined) {
+      alert(json.message);
+    } else {
+      global.book = json;
+      console.log(json.pages[15]);
+      this.setGroupPages(json.pages);
+      this.setCurrentBookIndex(true);
+      this.forceUpdate();
     }
   };
 
@@ -68,9 +63,10 @@ class Home extends Component {
   }
 
   setCurrentOtherLayoutOptions = () => {
-   
     var currentPage = global.book.pages[global.currentBookIdx];
-    if(currentPage == undefined) {return;}
+    if (currentPage == undefined) {
+      return;
+    }
     var options = currentPage.otherLayoutOptions;
     var optionsToSet = [];
     for (var i = 0; i < options.length; i++) {
@@ -82,18 +78,31 @@ class Home extends Component {
   };
 
   editPage = () => {
-    this.setCurrentBookIndex(this.state.leftImageHighlighted);
-    var page = global.book.pages[global.currentBookIdx];
-    this.props.navigation.navigate("EditPage", {
-      page: page,
-      callback: this.callbackFromEdit
-    });
+    if (global.book.pages[global.currentBookIdx].entries.length == 1) {
+      //only one item in list no need to show whole list
+      global.currentEntryIndex = 0;
+      this.props.navigation.navigate("EditEntry", {
+        callback: this.callbackFromEditEntry
+      });
+    } else {
+      //show list of items to update
+      this.setCurrentBookIndex(this.state.leftImageHighlighted);
+      var page = global.book.pages[global.currentBookIdx];
+      this.props.navigation.navigate("EditPage", {
+        page: page,
+        callback: this.callbackFromEdit
+      });
+    }
   };
 
   callbackfromEditSuccess = json => {
     global.book.pages[global.currentBookIdx] = json.pages[0];
     this.setGroupPages(global.book.pages);
-  }
+  };
+
+  callbackFromEditEntry = () => {
+    this.callbackFromEdit(true, false)
+  };
 
   callbackFromEdit = (needsLayout, didDeletePage) => {
     if (didDeletePage == false) {
@@ -101,7 +110,8 @@ class Home extends Component {
         global.book,
         global.currentBookIdx,
         false,
-        needsLayout, this.callbackfromEditSuccess,
+        needsLayout,
+        this.callbackfromEditSuccess,
         err => {}
       );
     } else {
@@ -125,18 +135,18 @@ class Home extends Component {
     this.forceUpdate();
   };
   componentWillUnmount() {
-    Dimensions.removeEventListener("change", this.dimensionsChangedHandler)
-    tacoDbHelper.destroy()
+    Dimensions.removeEventListener("change", this.dimensionsChangedHandler);
+    tacoDbHelper.destroy();
   }
 
   dimensionsChangedHandler = ({ window: { width, height } }) => {
     this.setDimensionsForSlider(width, height);
     this.forceUpdate();
-  }
+  };
 
   componentDidMount() {
-    console.log("component did mount")
-    tacoDbHelper.setup()
+    console.log("component did mount");
+    tacoDbHelper.setup();
     Dimensions.addEventListener("change", this.dimensionsChangedHandler);
     const { width, height } = Dimensions.get("window");
     this.setDimensionsForSlider(width, height);
@@ -148,64 +158,62 @@ class Home extends Component {
         this.createBookSuccess,
         this.createBookError
       );
-    } 
-    else if(global.bookNeedsUpdate) {
+    } else if (global.bookNeedsUpdate) {
       this.updateBookFromGlobal();
       global.bookNeedsUpdate = false;
-    }
-    else {
+    } else {
       this.setGroupPages(global.book.pages);
     }
   }
 
   setGroupPagesGlobal = () => {
-    if(global.book != undefined) {
-      this.setGroupPages(global.book.pages)
+    if (global.book != undefined) {
+      this.setGroupPages(global.book.pages);
     }
-  }
+  };
 
   setDimensionsForSlider(viewportWidth, viewportHeight) {
     if (viewportWidth > viewportHeight) {
       sliderWidth = viewportWidth - 100;
       this.setState({ isLandscape: true }, () => {
-        this.setGroupPagesGlobal()
+        this.setGroupPagesGlobal();
       });
     } else {
       sliderWidth = viewportWidth;
       this.setState({ isLandscape: false }, () => {
-        this.setGroupPagesGlobal()
+        this.setGroupPagesGlobal();
       });
     }
     itemWidth = sliderWidth;
   }
 
   setCurrentBookIndex = _leftImageHighlighted => {
-    if(this._carousel == undefined) {
+    if (this._carousel == undefined) {
       return;
     }
 
-    if(this.state.groupPages == 0) {
+    if (this.state.groupPages == 0) {
       return;
     }
 
     var idx = this._carousel.currentIndex;
     global.currentSnapIndex = idx;
     var idx1 = this.state.groupPages[idx].pageIndex1 - 1;
-   
+
     if (_leftImageHighlighted == false) {
       idx1 = this.state.groupPages[idx].pageIndex2 - 1;
     }
-   
+
     global.currentBookIdx = idx1;
     this.setCurrentOtherLayoutOptions();
   };
 
   setGroupPages = pages => {
-    if(pages == undefined) {
+    if (pages == undefined) {
       return;
     }
     //split pages into page numbers...
-    if(pages.length == 0) {
+    if (pages.length == 0) {
       return;
     }
     var groupPages = [];
@@ -229,132 +237,127 @@ class Home extends Component {
   };
 
   handleRightImageTouched = () => {
-      this.setState({ leftImageHighlighted: false });
-      this.setCurrentBookIndex(false);
-      console.log("right one touched...");
+    this.setState({ leftImageHighlighted: false });
+    this.setCurrentBookIndex(false);
+    console.log("right one touched...");
   };
 
   handleLeftImageTouched = () => {
-      this.setState({ leftImageHighlighted: true });
-      this.setCurrentBookIndex(true);
-      console.log("left one touched...");
+    this.setState({ leftImageHighlighted: true });
+    this.setCurrentBookIndex(true);
+    console.log("left one touched...");
   };
 
-  _handleStateChange = (event) => {
+  _handleStateChange = event => {};
 
-  }
-
-  _handleStateChange2 = (event) => {
-    
-  }
+  _handleStateChange2 = event => {};
 
   incrementErrorImageCount = (page, isLeft) => {
-    if(isLeft) {
-      if(page.errorImageCountL == undefined) {
-        page.errorImageCountL = 1
+    if (isLeft) {
+      if (page.errorImageCountL == undefined) {
+        page.errorImageCountL = 1;
+      } else {
+        page.errorImageCountL += 1;
       }
-      else {
-        page.errorImageCountL += 1
+    } else {
+      if (page.errorImageCountR == undefined) {
+        page.errorImageCountR = 1;
+      } else {
+        page.errorImageCountR += 1;
       }
-    
     }
-    else {
-    if(page.errorImageCountR == undefined) {
-      page.errorImageCountR = 1
-    }
-    else {
-      page.errorImageCountR += 1
-    }
-    
-  }
-  
-  }
+  };
 
   onImageLoad = (index, isLeft) => {
-    const imageErrorRetryCount = 3
-    var page = this.state.groupPages[index]
-    var errorCount = (isLeft)?page.errorImageCountL:page.errorImageCountR
-    if(errorCount != undefined && errorCount <= imageErrorRetryCount) {
-      var needsUpdate = false
-      if(isLeft && page.original1Image != undefined) {
-        page.page1Image = page.original1Image
-        needsUpdate = true
-      }
-      else if (page.original2Image != undefined)  {
-        page.page2Image = page.original2Image
-        needsUpdate = true
+    const imageErrorRetryCount = 3;
+    var page = this.state.groupPages[index];
+    var errorCount = isLeft ? page.errorImageCountL : page.errorImageCountR;
+    if (errorCount != undefined && errorCount <= imageErrorRetryCount) {
+      var needsUpdate = false;
+      if (isLeft && page.original1Image != undefined) {
+        page.page1Image = page.original1Image;
+        needsUpdate = true;
+      } else if (page.original2Image != undefined) {
+        page.page2Image = page.original2Image;
+        needsUpdate = true;
       }
 
-      if(needsUpdate) {
-        var pages = this.state.groupPages
-        pages[index] = page
-        this.setState({groupPages: pages})  
+      if (needsUpdate) {
+        var pages = this.state.groupPages;
+        pages[index] = page;
+        this.setState({ groupPages: pages });
       }
     }
-  }
+  };
 
-  onImageError  = (index, isLeft) => {
-    var page = this.state.groupPages[index]
-    this.incrementErrorImageCount(page, isLeft)
-      if(isLeft) {
-        page.original1Image = page.page1Image
-        page.page1Image = "https://s3.amazonaws.com/rainhut/404Error.png"
-      }
-      else {
-        page.original2Image = page.page2Image
-        page.page2Image = "https://s3.amazonaws.com/rainhut/404Error.png"
-      }
-      var pages = this.state.groupPages
-      pages[index] = page
-      this.setState({groupPages: pages})  
-  }
+  onImageError = (index, isLeft) => {
+    var page = this.state.groupPages[index];
+    this.incrementErrorImageCount(page, isLeft);
+    if (isLeft) {
+      page.original1Image = page.page1Image;
+      page.page1Image = "https://s3.amazonaws.com/rainhut/404Error.png";
+    } else {
+      page.original2Image = page.page2Image;
+      page.page2Image = "https://s3.amazonaws.com/rainhut/404Error.png";
+    }
+    var pages = this.state.groupPages;
+    pages[index] = page;
+    this.setState({ groupPages: pages });
+  };
 
   getCarouselImageItem = (source, isLeft, index) => {
-    return(
-    <TouchableOpacity style={{ flex: 1 }}
-      onPress={isLeft?this.handleLeftImageTouched:this.handleRightImageTouched}
-    >
-      <View style={{ flex: 1 }}>
-        <Image
-          onLoad={()=>this.onImageLoad(index, isLeft)}
-          onError={()=>this.onImageError(index, isLeft)}
-          source={{ uri: source }}
-          indicator={Progress.Pie}
-          resizeMode="contain"
-          indicatorProps={{
-            size: 80,
-            borderWidth: 0,
-            color: "rgba(150, 150, 150, 1)",
-            unfilledColor: "rgba(200, 200, 200, 0.2)"
-          }}
-          style={style.image}
-        />
-      </View>
-    </TouchableOpacity>)
-  }
+    return (
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={
+          isLeft ? this.handleLeftImageTouched : this.handleRightImageTouched
+        }
+      >
+        <View style={{ flex: 1 }}>
+          <Image
+            onLoad={() => this.onImageLoad(index, isLeft)}
+            onError={() => this.onImageError(index, isLeft)}
+            source={{ uri: source }}
+            indicator={Progress.Pie}
+            resizeMode="contain"
+            indicatorProps={{
+              size: 80,
+              borderWidth: 0,
+              color: "rgba(150, 150, 150, 1)",
+              unfilledColor: "rgba(200, 200, 200, 0.2)"
+            }}
+            style={style.image}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   _renderItem = ({ item, index }) => {
-      return (
-        <View
-          style={{ flex: 1 }}
-          shouldComponentUpdate="true"
-        >
-          <View style={style.imageContainer}>
-            {this.getCarouselImageItem(item.page1Image, true, index)}
-            {(item.page2Image == undefined)?(<View/>):(
-              this.getCarouselImageItem(item.page2Image, false, index)
-            )}
-          </View>
-          <View style={{ height: 30, flexDirection: "row" }}>
-            <Text
-              style={[
-                style.text,
-                (this.state.leftImageHighlighted && this.state.isLandscape ) ? style.textHightlighted : ""
-              ]}
-            >
-              Page {item.pageIndex1}
-            </Text>
-            {(item.page2Image == undefined)?(<View/>):(
+    return (
+      <View style={{ flex: 1 }} shouldComponentUpdate="true">
+        <View style={style.imageContainer}>
+          {this.getCarouselImageItem(item.page1Image, true, index)}
+          {item.page2Image == undefined ? (
+            <View />
+          ) : (
+            this.getCarouselImageItem(item.page2Image, false, index)
+          )}
+        </View>
+        <View style={{ height: 30, flexDirection: "row" }}>
+          <Text
+            style={[
+              style.text,
+              this.state.leftImageHighlighted && this.state.isLandscape
+                ? style.textHightlighted
+                : ""
+            ]}
+          >
+            Page {item.pageIndex1}
+          </Text>
+          {item.page2Image == undefined ? (
+            <View />
+          ) : (
             <Text
               style={[
                 style.text,
@@ -362,10 +365,11 @@ class Home extends Component {
               ]}
             >
               Page {item.pageIndex2}
-            </Text>)}
-          </View>
+            </Text>
+          )}
         </View>
-      );
+      </View>
+    );
   };
 
   didPickLayout = newLayout => {
@@ -380,7 +384,7 @@ class Home extends Component {
       global.currentBookIdx,
       false,
       false,
-      (json) => {
+      json => {
         this._updateBookComplete(json, this.state.leftImageHighlighted, 0);
       },
       err => {}
@@ -509,10 +513,10 @@ class Home extends Component {
       borderWidth: 4
     };
 
-    var idx = 0
-    this._carousel._snapToItem(this.state.groupPages[0])
+    var idx = 0;
+    this._carousel._snapToItem(this.state.groupPages[0]);
     global.currentSnapIndex = idx;
-    
+
     var copyBook = JSON.parse(JSON.stringify(global.book));
     if (themeId == 1) {
       copyBook.setup = setupTheme1;
@@ -520,7 +524,7 @@ class Home extends Component {
       copyBook.setup = setupTheme2;
     }
     global.book = copyBook;
-    this.updateBookFromGlobal()
+    this.updateBookFromGlobal();
   };
 
   updateBookFromGlobal = () => {
@@ -538,9 +542,10 @@ class Home extends Component {
         );
       },
       err => {
-        console.err(err)
-      });
-  }
+        console.err(err);
+      }
+    );
+  };
 
   _updateBookComplete = (json, isFirstIndex, currentOtherIndex, allPages) => {
     var idx2 = global.currentBookIdx;
@@ -562,22 +567,19 @@ class Home extends Component {
     this.forceUpdate();
     this.setState({ isUpdateLayout: false });
   };
-  
+
   gotoCheckout = () => {
     this.props.navigation.navigate("CheckoutSummary");
-  }
-
-
-
+  };
 
   saveBook = () => {
-    RainhutUploadBook(global.book, ()=> {
-      console.log("uploaded...")
-    })
-    global.checkout = checkoutObjectInit()
+    RainhutUploadBook(global.book, () => {
+      console.log("uploaded...");
+    });
+    global.checkout = checkoutObjectInit();
     tacoDbHelper.insertCurrentBook(() => {
-      this.gotoCheckout()
-    })
+      this.gotoCheckout();
+    });
   };
 
   render() {
@@ -586,8 +588,8 @@ class Home extends Component {
         <Container style={styles.container}>
           <Header />
           <Body style={styles.container}>
-            <Text style={{marginTop: 20}}>Creating Book</Text>
-            <ActivityIndicator style={{marginTop: 40}} size="large" />
+            <Text style={{ marginTop: 20 }}>Creating Book</Text>
+            <ActivityIndicator style={{ marginTop: 40 }} size="large" />
           </Body>
         </Container>
       );
@@ -619,121 +621,129 @@ class Home extends Component {
             </Body>
             <Right>
               <Button
-                transparent 
+                transparent
                 onPress={() => {
                   this.saveBook();
                 }}
               >
                 <Icon name="checkmark-circle" />
-                <Text></Text>
+                <Text />
               </Button>
             </Right>
           </Header>
-            <View
-              style={
-                this.state.isLandscape
-                  ? [styles.container, styles.flexRow]
-                  : [styles.container, styles.flex, {flexDirection: "column"}]
-              }
-            >
-                <Carousel
-                  ref={c => {
-                    this._carousel = c;
+          <View
+            style={
+              this.state.isLandscape
+                ? [styles.container, styles.flexRow]
+                : [styles.container, styles.flex, { flexDirection: "column" }]
+            }
+          >
+            <Carousel
+              ref={c => {
+                this._carousel = c;
+              }}
+              data={this.state.groupPages}
+              renderItem={this._renderItem.bind(this)}
+              sliderWidth={sliderWidth}
+              itemWidth={itemWidth}
+              initialNumToRender={3}
+              maxToRenderPerBatch={4}
+              onSnapToItem={index => {
+                this.setState({ leftImageHighlighted: true });
+                this.setCurrentBookIndex(true);
+              }}
+            />
+            {this.state.editIndex == 0 && (
+              <View
+                style={
+                  this.state.isLandscape
+                    ? style.iconsLandscape
+                    : style.iconsPortrait
+                }
+              >
+                <Button
+                  light
+                  style={style.rightButton}
+                  onPress={() => {
+                    this.editPage();
                   }}
-                  data={this.state.groupPages}
-                  renderItem={this._renderItem.bind(this)}
-                  sliderWidth={sliderWidth}
-                  itemWidth={itemWidth}
-                  initialNumToRender={3}
-                  maxToRenderPerBatch={4}
-                  onSnapToItem={index => {
-                    this.setState({ leftImageHighlighted: true });
-                    this.setCurrentBookIndex(true);
-                  }}
-                />
-              {this.state.editIndex == 0 && (
-                <View
-                  style={
-                    this.state.isLandscape
-                      ? style.iconsLandscape
-                      : style.iconsPortrait
-                  }
                 >
-                  <Button light
-                    style={style.rightButton}
-                    onPress={() => {
-                      this.editPage();
-                    }}
-                  >
-                    <Icon name="create" />
-                  </Button>
-                  <Button light
-                     style={style.rightButton}
-                    
-                    onPress={this.editThemes}
-                  >
-                    <Icon name="color-palette" />
-                  </Button>
-                  <Button light style={style.rightButton} onPress={this.editLayouts}>
-                    <Icon name="grid" />
-                  </Button>
-                </View>
-              )}
+                  <Icon name="create" />
+                </Button>
+                <Button
+                  light
+                  style={style.rightButton}
+                  onPress={this.editThemes}
+                >
+                  <Icon name="color-palette" />
+                </Button>
+                <Button
+                  light
+                  style={style.rightButton}
+                  onPress={this.editLayouts}
+                >
+                  <Icon name="grid" />
+                </Button>
+              </View>
+            )}
 
-              {this.state.editIndex == 1 && (
-                <View
+            {this.state.editIndex == 1 && (
+              <View
+                style={
+                  this.state.isLandscape
+                    ? style.iconsLandscape
+                    : style.iconsPortrait
+                }
+              >
+                <Button
                   style={
                     this.state.isLandscape
-                      ? style.iconsLandscape
-                      : style.iconsPortrait
+                      ? style.closeButtonL
+                      : style.closeButtonP
                   }
+                  transparent
+                  onPress={() => {
+                    this.closeEdit();
+                  }}
                 >
-                  <Button 
-                    style={this.state.isLandscape?style.closeButtonL:style.closeButtonP}
-                     transparent
-                    onPress={() => {
-                      this.closeEdit();
-                    }}
-                  >
-               
-                    <Icon name="close-circle" />
-           
-                  </Button>
-                  <PickLayouts
-                    isHorizontal={!this.state.isLandscape}
-                    direction={this.state.isLandscape?"column":"row"}
-                    items={this.state.currentOtherLayoutOptions}
-                    didClickLayout={this.didPickLayout}
-                  />
-                </View>
-              )}
-              {this.state.editIndex == 2 && (
-                <View
+                  <Icon name="close-circle" />
+                </Button>
+                <PickLayouts
+                  isHorizontal={!this.state.isLandscape}
+                  direction={this.state.isLandscape ? "column" : "row"}
+                  items={this.state.currentOtherLayoutOptions}
+                  didClickLayout={this.didPickLayout}
+                />
+              </View>
+            )}
+            {this.state.editIndex == 2 && (
+              <View
+                style={
+                  this.state.isLandscape
+                    ? style.iconsLandscape
+                    : style.iconsPortrait
+                }
+              >
+                <Button
                   style={
                     this.state.isLandscape
-                      ? style.iconsLandscape
-                      : style.iconsPortrait
+                      ? style.closeButtonL
+                      : style.closeButtonP
                   }
+                  transparent
+                  onPress={() => {
+                    this.closeEdit();
+                  }}
                 >
-                  <Button
-                  style={this.state.isLandscape?style.closeButtonL:style.closeButtonP}
-                    transparent
-                    onPress={() => {
-                      this.closeEdit();
-                    }}
-                  >
-                
-                    <Icon name="close-circle" />
-                 
-                  </Button>
-                  <PickThemes
-                     isHorizontal={!this.state.isLandscape}
-                     direction={this.state.isLandscape?"column":"row"}
-                    didClickTheme={this.didClickTheme}
-                  />
-                </View>
-              )}
-           
+                  <Icon name="close-circle" />
+                </Button>
+                <PickThemes
+                  isHorizontal={!this.state.isLandscape}
+                  direction={this.state.isLandscape ? "column" : "row"}
+                  didClickTheme={this.didClickTheme}
+                />
+              </View>
+            )}
           </View>
         </Container>
       );

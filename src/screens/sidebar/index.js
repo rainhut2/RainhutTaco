@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Image } from "react-native";
+
 import {
   Content,
   Text,
@@ -12,7 +12,6 @@ import {
   Badge
 } from "native-base";
 import styles from "./style";
-import View from "../../theme/components/View";
 
 //const drawerCover = require("../../../assets/drawer-cover.png");
 //const drawerImage = require("../../../assets/logo-kitchen-sink.png");
@@ -33,7 +32,7 @@ const datas = [
     name: "Saved Books",
     route: "Saved",
     icon: "heart",
-    bg: "#477EEA",
+    bg: "#477EEA"
   }
 ];
 
@@ -53,13 +52,11 @@ class SideBar extends Component {
           bounces={false}
           style={{ flex: 1, backgroundColor: "#fff", top: -1 }}
         >
-         
-         <Content style={{flex: 1, backgroundColor: "#fff", height: 100}}>
-         </Content>
+          <Content style={{ flex: 1, backgroundColor: "#fff", height: 100 }} />
 
           <List
             dataArray={datas}
-            renderRow={data =>
+            renderRow={data => (
               <ListItem
                 button
                 noBorder
@@ -71,11 +68,9 @@ class SideBar extends Component {
                     name={data.icon}
                     style={{ color: "#777", fontSize: 26, width: 30 }}
                   />
-                  <Text style={styles.text}>
-                    {data.name}
-                  </Text>
+                  <Text style={styles.text}>{data.name}</Text>
                 </Left>
-                {data.types &&
+                {data.types && (
                   <Right style={{ flex: 1 }}>
                     <Badge
                       style={{
@@ -85,12 +80,14 @@ class SideBar extends Component {
                         backgroundColor: data.bg
                       }}
                     >
-                      <Text
-                        style={styles.badgeText}
-                      >{`${data.types} Types`}</Text>
+                      <Text style={styles.badgeText}>{`${
+                        data.types
+                      } Types`}</Text>
                     </Badge>
-                  </Right>}
-              </ListItem>}
+                  </Right>
+                )}
+              </ListItem>
+            )}
           />
         </Content>
       </Container>

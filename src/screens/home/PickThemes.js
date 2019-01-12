@@ -5,17 +5,23 @@ import { Content, View } from "native-base";
 export default class PickThemes extends Component {
   render() {
     var themes = [
-      { id: 1, title: "blue", url: "", color: '#00ff00' },
-      { id: 2, title: "red", url: "" , color: '#ff0000'}
+      { id: 1, title: "blue", url: "", color: "#00ff00" },
+      { id: 2, title: "red", url: "", color: "#ff0000" }
     ];
     var layouts = [];
     for (var i = 0; i < themes.length; i++) {
       layouts.push(
         <View key={i} style={{ width: 100, height: 100 }}>
-          <TouchableHighlight style={{ width: 100, height: 100, backgroundColor: themes[i].color }}
+          <TouchableHighlight
+            style={{
+              width: 100,
+              height: 100,
+              backgroundColor: themes[i].color
+            }}
             onPress={this.props.didClickTheme.bind(this, themes[i].id)}
-            
-          ><Text>Theme</Text></TouchableHighlight>
+          >
+            <Text>Theme</Text>
+          </TouchableHighlight>
         </View>
       );
     }
